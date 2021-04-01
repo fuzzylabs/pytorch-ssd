@@ -16,6 +16,7 @@ class TrainAugmentation:
             Expand(self.mean),
             RandomSampleCrop(),
             RandomMirror(),
+            PerspectiveWarp(),
             ToPercentCoords(),
             Resize(self.size),
             SubtractMeans(self.mean),

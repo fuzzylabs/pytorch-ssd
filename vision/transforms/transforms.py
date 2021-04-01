@@ -347,6 +347,20 @@ class Expand(object):
 
         return image, boxes, labels
 
+import imgaug.augmenters as iaa
+from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
+import logging
+
+class PerspectiveWarp(object):
+    def __init__(self, scale=(0.01, 0.15)):
+        self.aug = iaa.PerspectiveTransform(scale=scale)
+
+    def __call__(call, image, boxes=None, labels=None):
+        bbs = BoundingBoxesOnImage([BoundingBox(x1=bbox[0], x2=bbox[2], y1=bbox[1], y2=bbox[3]) for bbox in boxes], shape=image.shape)
+        _image, _bbs = call.aug(image=image, bounding_boxes=bbs)
+        _boxes = np.stack([[bbox.x1, bbox.y1, bbox.x2, bbox.y2] for bbox in _bbs.bounding_boxes])
+        # logging.info(f"Perspective warp: {boxes}, {_boxes}")
+        return _image, _boxes, labels
 
 class RandomMirror(object):
     def __call__(self, image, boxes, classes):
